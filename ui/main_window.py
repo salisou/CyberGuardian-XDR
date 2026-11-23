@@ -2,6 +2,8 @@ from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QFra
 from ui.dashboard import Dashboard
 from ui.process_monitor import ProcessMonitor
 from ui.network_monitor import NetworkMonitor
+from ui.threat_intel import ThreatIntelligencePage
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -21,7 +23,12 @@ class MainWindow(QMainWindow):
         self.stack = QStackedWidget()
         self.pages = {}
         self.buttons = {}
-        pages = [("Dashboard", Dashboard()), ("Processes", ProcessMonitor()), ("Network", NetworkMonitor())]
+        pages = [
+            ("Dashboard", Dashboard()),
+            ("Processes", ProcessMonitor()),
+            ("Network", NetworkMonitor()),
+            ("Threat Intelligence", ThreatIntelligencePage()),
+        ]
         for name, page in pages:
             self.pages[name] = page
             self.stack.addWidget(page)
@@ -30,7 +37,7 @@ class MainWindow(QMainWindow):
             button.clicked.connect(lambda checked=False, n=name: self.navigate(n))
             side.addWidget(button)
             self.buttons[name] = button
-        for name in ("System Monitor", "Event Viewer", "Threat Intelligence", "Vulnerability Scanner",
+        for name in ("System Monitor", "Event Viewer", "Vulnerability Scanner",
                      "Malware Analysis", "Forensics", "Reports", "AI Assistant", "Settings"):
             button = QPushButton(name + " · Not enabled yet")
             button.setEnabled(False)

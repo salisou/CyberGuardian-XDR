@@ -13,6 +13,7 @@ Supported target: Windows 10/11 x64 with Python 3.12 or newer.
 - Windows Event Viewer requires `pywin32`. The Event Viewer page is read-only and is available only on Windows.
 - YARA static scanning requires `yara-python`. Without it, the Malware Analysis page still calculates SHA-256 and displays a clear warning.
 - Threat Intelligence requires provider API keys supplied as environment variables: `VIRUSTOTAL_API_KEY`, `ABUSEIPDB_API_KEY`, and optionally `OTX_API_KEY`. Never place keys in source code, screenshots, reports, or Git commits. Restart the application after setting environment variables.
+- Vulnerability Scanner requires the Nmap executable installed separately and available in `PATH`. It performs a conservative TCP connect scan of the top 100 ports with service detection. The user must explicitly confirm authorization for each scan. It is a service-exposure assessment, not a CVE scanner.
 
 The database, settings and logs are stored in the current user's application-data folders, not in the source checkout. Run as a standard user by default; some operating-system telemetry may be unavailable without elevation.
 

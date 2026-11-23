@@ -8,8 +8,10 @@ from __future__ import annotations
 import hashlib
 import ipaddress
 import os
+import re
 from dataclasses import dataclass
 from typing import Any
+from urllib.parse import quote
 
 import requests
 
@@ -50,9 +52,19 @@ def validate_indicator(value: str, kind: str) -> str:
             raise ValueError("Hash non valido: usare MD5, SHA-1 o SHA-256")
         return normalized
     if kind == "domain":
-        if "/" in value or "://" in value or " " in value:
+        if "/" in value or "://" in value or any(char in value for char in "?#@"):
             raise ValueError("Inserire un dominio, non un URL")
-        return value.rstrip(".").lower()
+        domain = value.rstrip(".").lower()
+        try:
+            ascii_domain = domain.encode("idna").decode("ascii")
+        except UnicodeError as exc:
+            raise ValueError("Nome dominio non valido") from exc
+        if len(ascii_domain) > 253 or not re.fullmatch(
+            r"(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*",
+            ascii_domain,
+        ):
+            raise ValueError("Nome dominio non valido")
+        return ascii_domain
     raise ValueError("Tipo indicatore non supportato")
 
 
@@ -70,7 +82,7 @@ def lookup_virustotal(indicator: str, kind: str) -> ReputationResult:
         raise ThreatIntelError("Configurare VIRUSTOTAL_API_KEY nelle variabili d'ambiente")
     indicator = validate_indicator(indicator, kind)
     endpoint_kind = {"ip": "ip_addresses", "hash": "files", "domain": "domains"}[kind]
-    url = f"https://www.virustotal.com/api/v3/{endpoint_kind}/{indicator}"
+    url = f"https://www.virustotal.com/api/v3/{endpoint_kind}/{quote(indicator, safe='')}"
     try:
         response = _session().get(url, headers={"x-apikey": key}, timeout=TIMEOUT)
         if response.status_code == 404:
@@ -112,8 +124,11 @@ def lookup_abuseipdb(ip: str) -> ReputationResult:
 
 def lookup_otx(indicator: str, kind: str) -> ReputationResult:
     indicator = validate_indicator(indicator, kind)
-    section = {"ip": "IPv4", "hash": "file", "domain": "domain"}[kind]
-    url = f"https://otx.alienvault.com/api/v1/indicators/{section}/{indicator}/general"
+    if kind == "ip":
+        section = "IPv6" if ":" in indicator else "IPv4"
+    else:
+        section = {"hash": "file", "domain": "domain"}[kind]
+    url = f"https://otx.alienvault.com/api/v1/indicators/{section}/{quote(indicator, safe='')}/general"
     headers = {}
     key = os.getenv("OTX_API_KEY")
     if key:

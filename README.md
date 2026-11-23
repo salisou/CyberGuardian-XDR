@@ -4,7 +4,7 @@ CyberGuardian XDR is a modular Windows desktop security-monitoring and triage ap
 
 ## Project status
 
-The application is under active development in incremental milestones. The current develop branch includes a working application shell and service foundations for local monitoring, threat-intelligence lookups, static file analysis, Windows event review, authorized Nmap service assessment, evidence inventory and JSON/CSV export. This is an evolving development build, not a production-certified XDR platform.
+The application is under active development in incremental milestones. The current develop branch includes a working application shell and service foundations for local monitoring, threat-intelligence lookups, static file analysis, Windows event review, authorized Nmap service assessment, evidence inventory, local AI assistance and JSON/CSV export. This is an evolving development build, not a production-certified XDR platform.
 
 ## Available sections
 
@@ -16,12 +16,14 @@ The application is under active development in incremental milestones. The curre
 - Malware Analysis: SHA-256 and optional YARA static matching; no sample execution
 - Forensics: read-only file inventory and optional SHA-256 manifest
 - Reports: local security-event export to JSON or CSV
+- AI Assistant: local Ollama model interface, loopback only
 
 ## Requirements
 
 - Windows 10/11 x64
 - Python 3.12+
 - Nmap executable for the Vulnerability Scanner
+- Ollama installed locally and at least one downloaded model for AI Assistant
 - Optional: pywin32, yara-python, and provider API keys for the related integrations
 
 ## Quick start
@@ -46,6 +48,7 @@ For optional integrations, see [Installation](INSTALL.md).
 - Do not execute samples during malware analysis. Use isolated, disposable sandboxes for dynamic analysis.
 - Network and vulnerability scans require explicit authorization from the asset owner.
 - Reputation and heuristic scores are triage signals, not proof of compromise.
+- AI prompts are sent to the local Ollama service only; do not include secrets or unnecessary personal data.
 
 ## Documentation
 

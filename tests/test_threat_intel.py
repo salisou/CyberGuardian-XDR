@@ -35,4 +35,4 @@ def test_rejects_non_domain_values(value):
 
 
 def test_international_domain_is_normalized():
-    assert validate_indicator("caffè.example", "domain") == "xn--caff-5qa.example"
+    assert validate_indicator("caffè.example", "domain") == "xn--caff-8oa.example"

@@ -5,7 +5,7 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 from core.system_info import collect_system_metrics
 from core.threat_score import ThreatInputs, calculate_threat_score
-from core.alert_engine import list_alerts
+from core.alert_engine import count_open_alerts
 from core.logger import get_logger
 
 
@@ -48,7 +48,7 @@ class Dashboard(QWidget):
                 cpu_percent=metrics["cpu_percent"],
                 memory_percent=metrics["memory_percent"],
                 open_connections=metrics["connection_count"]))
-            open_alerts = len(list_alerts("OPEN", limit=1000))
+            open_alerts = count_open_alerts()
             values = {
                 "CPU": f'{metrics["cpu_percent"]:.1f}%',
                 "RAM": f'{metrics["memory_percent"]:.1f}%',

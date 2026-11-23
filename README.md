@@ -4,11 +4,12 @@ CyberGuardian XDR is a modular Windows desktop security-monitoring and triage ap
 
 ## Project status
 
-The application is under active development in incremental milestones. The current develop branch includes a working application shell and service foundations for local monitoring, threat-intelligence lookups, static file analysis, Windows event review, authorized Nmap service assessment, evidence inventory, local AI assistance and JSON/CSV export. This is an evolving development build, not a production-certified XDR platform.
+The application is under active development in incremental milestones. The current develop branch includes a working application shell and service foundations for local monitoring, threat-intelligence lookups, static file analysis, Windows event review, authorized Nmap service assessment, evidence inventory, local AI assistance, event correlation and alert lifecycle management. This is an evolving development build, not a production-certified XDR platform.
 
 ## Available sections
 
-- Dashboard with CPU/RAM telemetry and heuristic threat score
+- Dashboard with CPU/RAM telemetry, heuristic threat score and open-alert count
+- Alert Center with rule-based Windows event correlation and alert acknowledgement/closure
 - Process monitor and network connection viewer
 - Windows Event Viewer (optional pywin32)
 - Threat Intelligence: VirusTotal, AbuseIPDB and AlienVault OTX
@@ -17,6 +18,14 @@ The application is under active development in incremental milestones. The curre
 - Forensics: read-only file inventory and optional SHA-256 manifest
 - Reports: local security-event export to JSON or CSV
 - AI Assistant: local Ollama model interface, loopback only
+
+## Current correlation rules
+
+- Windows Security event 1102: audit log cleared (HIGH)
+- Windows System event 7045: service installation (MEDIUM)
+- Windows Security event 4625: at least five failed logons in the collected sample (MEDIUM/HIGH)
+
+The rules are explainable triage heuristics. They do not independently establish malicious intent, and event sampling is not a substitute for continuous SIEM collection.
 
 ## Requirements
 

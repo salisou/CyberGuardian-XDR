@@ -5,9 +5,8 @@ Rules are explainable triage heuristics, not proof of compromise.
 from __future__ import annotations
 
 import hashlib
-import json
 from datetime import datetime, timezone
-from sqlalchemy import select
+from sqlalchemy import func, select
 from core.database import SecurityAlert, SessionLocal
 
 
@@ -64,18 +63,12 @@ def persist_alerts(findings: list[dict], now: datetime | None = None) -> int:
             fingerprint = _fingerprint(item["rule_id"], item["source"])
             alert = session.scalar(select(SecurityAlert).where(SecurityAlert.fingerprint == fingerprint))
             if alert is None:
-                alert = SecurityAlert(
-                    fingerprint=fingerprint,
-                    first_seen=observed_at,
-                    last_seen=observed_at,
-                    severity=item["severity"],
-                    title=item["title"],
-                    source=item["source"],
-                    details=item["details"],
-                    occurrences=1,
-                    status="OPEN",
-                )
-                session.add(alert)
+                session.add(SecurityAlert(
+                    fingerprint=fingerprint, first_seen=observed_at,
+                    last_seen=observed_at, severity=item["severity"],
+                    title=item["title"], source=item["source"],
+                    details=item["details"], occurrences=1, status="OPEN",
+                ))
             else:
                 alert.last_seen = observed_at
                 alert.severity = item["severity"]
@@ -101,6 +94,13 @@ def list_alerts(status: str | None = None, limit: int = 500) -> list[dict]:
             "occurrences": row.occurrences, "status": row.status,
             "first_seen": row.first_seen.isoformat(), "last_seen": row.last_seen.isoformat(),
         } for row in rows]
+
+
+def count_open_alerts() -> int:
+    with SessionLocal() as session:
+        return int(session.scalar(
+            select(func.count(SecurityAlert.id)).where(SecurityAlert.status == "OPEN")
+        ) or 0)
 
 
 def update_alert_status(alert_id: int, status: str) -> bool:

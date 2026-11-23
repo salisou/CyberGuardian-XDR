@@ -5,7 +5,9 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 from core.system_info import collect_system_metrics
 from core.threat_score import ThreatInputs, calculate_threat_score
+from core.alert_engine import list_alerts
 from core.logger import get_logger
+
 
 class MetricCard(QFrame):
     def __init__(self, title):
@@ -17,16 +19,17 @@ class MetricCard(QFrame):
         self.value.setStyleSheet("font-size:22pt;font-weight:600;")
         layout.addWidget(self.value)
 
+
 class Dashboard(QWidget):
     def __init__(self):
         super().__init__()
         root = QVBoxLayout(self)
         grid = QGridLayout()
         self.cards = {}
-        for i, title in enumerate(("CPU", "RAM", "Disk", "Threat Score", "Processes", "Connections")):
+        for i, title in enumerate(("CPU", "RAM", "Disk", "Threat Score", "Processes", "Connections", "Open Alerts")):
             card = MetricCard(title)
             self.cards[title] = card
-            grid.addWidget(card, i // 3, i % 3)
+            grid.addWidget(card, i // 4, i % 4)
         root.addLayout(grid)
         self.figure = Figure(figsize=(8, 3), tight_layout=True)
         self.canvas = FigureCanvasQTAgg(self.figure)
@@ -45,6 +48,7 @@ class Dashboard(QWidget):
                 cpu_percent=metrics["cpu_percent"],
                 memory_percent=metrics["memory_percent"],
                 open_connections=metrics["connection_count"]))
+            open_alerts = len(list_alerts("OPEN", limit=1000))
             values = {
                 "CPU": f'{metrics["cpu_percent"]:.1f}%',
                 "RAM": f'{metrics["memory_percent"]:.1f}%',
@@ -52,6 +56,7 @@ class Dashboard(QWidget):
                 "Threat Score": f"{assessment.score}/100 · {assessment.level}",
                 "Processes": str(metrics["process_count"]),
                 "Connections": str(metrics["connection_count"]),
+                "Open Alerts": str(open_alerts),
             }
             for key, value in values.items():
                 self.cards[key].value.setText(value)

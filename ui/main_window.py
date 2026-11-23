@@ -2,12 +2,13 @@ from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QFra
 from ui.dashboard import Dashboard
 from ui.process_monitor import ProcessMonitor
 from ui.network_monitor import NetworkMonitor
-from ui.threat_intel import ThreatIntelligencePage
-from ui.malware_analysis import MalwareAnalysisPage
 from ui.event_viewer import EventViewerPage
-from ui.reports import ReportsPage
+from ui.alert_center import AlertCenterPage
+from ui.threat_intel import ThreatIntelligencePage
 from ui.vulnerability_scanner import VulnerabilityScannerPage
+from ui.malware_analysis import MalwareAnalysisPage
 from ui.forensics import ForensicsPage
+from ui.reports import ReportsPage
 from ui.ai_assistant import AIAssistantPage
 
 
@@ -31,6 +32,7 @@ class MainWindow(QMainWindow):
         self.buttons = {}
         pages = [
             ("Dashboard", Dashboard()),
+            ("Alert Center", AlertCenterPage()),
             ("Processes", ProcessMonitor()),
             ("Network", NetworkMonitor()),
             ("Event Viewer", EventViewerPage()),

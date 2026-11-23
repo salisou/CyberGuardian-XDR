@@ -1,4 +1,4 @@
-"""Export structured security data to JSON and CSV without leaking secrets."""
+"""Export structured security data to JSON and CSV with safe CSV cells."""
 from __future__ import annotations
 
 import csv
@@ -17,6 +17,13 @@ def _safe_value(value: Any) -> Any:
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
     return str(value)
+
+
+def _csv_safe(value: Any) -> Any:
+    """Prevent spreadsheet formula execution from untrusted string cells."""
+    if isinstance(value, str) and value.startswith(("=", "+", "-", "@", "\t", "\r")):
+        return "'" + value
+    return value
 
 
 def export_records(records: Iterable[Mapping[str, Any]], destination: str,
@@ -47,7 +54,7 @@ def export_records(records: Iterable[Mapping[str, Any]], destination: str,
                 writer = csv.DictWriter(stream, fieldnames=fieldnames, extrasaction="ignore")
                 if fieldnames:
                     writer.writeheader()
-                    writer.writerows(rows)
+                    writer.writerows([{key: _csv_safe(value) for key, value in row.items()} for row in rows])
         temporary.replace(target)
     except Exception:
         temporary.unlink(missing_ok=True)

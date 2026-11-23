@@ -8,6 +8,7 @@ from ui.event_viewer import EventViewerPage
 from ui.reports import ReportsPage
 from ui.vulnerability_scanner import VulnerabilityScannerPage
 from ui.forensics import ForensicsPage
+from ui.ai_assistant import AIAssistantPage
 
 
 class MainWindow(QMainWindow):
@@ -38,6 +39,7 @@ class MainWindow(QMainWindow):
             ("Malware Analysis", MalwareAnalysisPage()),
             ("Forensics", ForensicsPage()),
             ("Reports", ReportsPage()),
+            ("AI Assistant", AIAssistantPage()),
         ]
         for name, page in pages:
             self.pages[name] = page
@@ -47,7 +49,7 @@ class MainWindow(QMainWindow):
             button.clicked.connect(lambda checked=False, n=name: self.navigate(n))
             side.addWidget(button)
             self.buttons[name] = button
-        for name in ("System Monitor", "AI Assistant", "Settings"):
+        for name in ("System Monitor", "Settings"):
             button = QPushButton(name + " · Not enabled yet")
             button.setEnabled(False)
             side.addWidget(button)

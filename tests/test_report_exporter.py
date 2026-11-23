@@ -23,6 +23,14 @@ def test_csv_export(tmp_path):
     assert rows == [{"event": "test", "severity": "LOW"}]
 
 
+def test_csv_formula_injection_is_neutralized(tmp_path):
+    target = tmp_path / "report.csv"
+    export_records([{"message": "=HYPERLINK(\"https://evil.example\")"}], str(target), "csv")
+    with target.open(encoding="utf-8-sig", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    assert rows[0]["message"].startswith("'=HYPERLINK")
+
+
 def test_rejects_unknown_format(tmp_path):
     with pytest.raises(ValueError):
         export_records([], str(tmp_path / "report.xml"), "xml")

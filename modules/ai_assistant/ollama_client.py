@@ -16,14 +16,16 @@ class OllamaError(RuntimeError):
 def _request(method: str, path: str, **kwargs):
     url = f"{BASE_URL}{path}"
     try:
-        response = requests.request(
-            method, url, timeout=(CONNECT_TIMEOUT, GENERATE_TIMEOUT),
-            allow_redirects=False, **kwargs
-        )
-        response.raise_for_status()
-        if len(response.content) > MAX_RESPONSE_BYTES:
-            raise OllamaError("Risposta Ollama oltre il limite consentito")
-        return response.json()
+        with requests.Session() as session:
+            session.trust_env = False
+            response = session.request(
+                method, url, timeout=(CONNECT_TIMEOUT, GENERATE_TIMEOUT),
+                allow_redirects=False, **kwargs
+            )
+            response.raise_for_status()
+            if len(response.content) > MAX_RESPONSE_BYTES:
+                raise OllamaError("Risposta Ollama oltre il limite consentito")
+            return response.json()
     except requests.RequestException as exc:
         raise OllamaError(
             "Ollama non raggiungibile su 127.0.0.1:11434. "

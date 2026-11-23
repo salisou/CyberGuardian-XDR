@@ -1,0 +1,5 @@
+# Optional Windows Event Log integration
+pywin32>=306; platform_system == 'Windows'
+
+# Optional YARA static scanning (install from a trusted package source)
+yara-python>=4.5,<5
